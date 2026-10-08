@@ -22,6 +22,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.security:spring-security-crypto' // BCrypt p/ hash de senha (sem auto-config web)
+	implementation 'com.auth0:java-jwt:4.4.0'
+	implementation 'com.google.api-client:google-api-client:2.7.1' // verificacao do idToken do Google
 	runtimeOnly 'org.postgresql:postgresql'
 	testRuntimeOnly 'com.h2database:h2' // testes continuam com H2 em memoria
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -17,7 +17,8 @@
       "name": "Base Environment",
       "data": {
         "base_url": "http://localhost:8080",
-        "user_id": "00000000-0000-0000-0000-000000000000"
+        "user_id": "00000000-0000-0000-0000-000000000000",
+        "token": "COLE_O_JWT_AQUI"
       }
     },
     {
@@ -154,6 +155,119 @@
         {
           "name": "X-User-Role",
           "value": "admin"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "grp_auth",
+      "_type": "request_group",
+      "parentId": "wrk_erplocal",
+      "name": "Auth",
+      "description": "Task3 - registro/login JWT + Google. Copie o token p/ a env _.token e use como Bearer nos Users."
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Register",
+      "description": "POST /api/auth/register - sempre USER; 409 se email repetido",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Ana\",\n  \"email\": \"ana@local\",\n  \"password\": \"s3cr3t!\"\n}"
+      }
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Login",
+      "description": "POST /api/auth/login - 401 se credenciais invalidas",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"ana@local\",\n  \"password\": \"s3cr3t!\"\n}"
+      }
+    },
+    {
+      "_id": "req_google_login",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Google Login",
+      "description": "POST /api/auth/google - idToken do botao Google (GIS); cria usuario GOOGLE se nao existir",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/google",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"idToken\": \"COLE_O_ID_TOKEN_AQUI\"\n}"
+      }
+    },
+    {
+      "_id": "req_google_code_login",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Google Code Login (Tauri)",
+      "description": "POST /api/auth/google/code - fluxo PKCE do app instalado; backend troca pelo idToken com o secret",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/google/code",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"code\": \"COLE_O_CODE_AQUI\",\n  \"codeVerifier\": \"COLE_O_VERIFIER_AQUI\",\n  \"redirectUri\": \"http://127.0.0.1:PORTA/callback\"\n}"
+      }
+    },
+    {
+      "_id": "req_list_users_bearer",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "List Users (Bearer)",
+      "description": "GET /api/users com Authorization Bearer do login (troque _.token)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users?page=0&size=20",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
         }
       ],
       "authentication": {},

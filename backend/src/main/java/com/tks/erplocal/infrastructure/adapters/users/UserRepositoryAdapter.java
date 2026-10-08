@@ -76,9 +76,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     private User toDomain(UserEntity e) {
         Set<String> permissions = grants.findByUserId(e.getId()).stream()
                 .map(UserPermissionEntity::getPermissionCode).collect(Collectors.toSet());
-        return new User(
+        User user = new User(
                 e.getId(), e.getName(), e.getEmail(), e.getPasswordHash(),
                 e.getRole(), e.isActive(), e.getConsentAt(), e.getCreatedAt(), permissions);
+        user.setProvider(e.getProvider());
+        return user;
     }
 
     private UserEntity toEntity(User u) {
@@ -91,6 +93,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         e.setActive(u.isActive());
         e.setConsentAt(u.getConsentAt());
         e.setCreatedAt(u.getCreatedAt());
+        e.setProvider(u.getProvider());
         return e;
     }
 }

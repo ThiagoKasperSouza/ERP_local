@@ -15,6 +15,7 @@ public class User {
     private Instant createdAt;
     private Set<String> permissions;
     private String permissionsGrantedBy;
+    private AuthProvider provider;
 
     public User(UUID id, String name, String email, String passwordHash, Role role,
                 boolean active, Instant consentAt, Instant createdAt, Set<String> permissions) {
@@ -46,4 +47,6 @@ public class User {
     public void setPermissions(Set<String> permissions) { this.permissions = permissions; }
     public String getPermissionsGrantedBy() { return permissionsGrantedBy; }
     public void setPermissionsGrantedBy(String permissionsGrantedBy) { this.permissionsGrantedBy = permissionsGrantedBy; }
+    public AuthProvider getProvider() { return provider == null ? AuthProvider.LOCAL : provider; }
+    public void setProvider(AuthProvider provider) { this.provider = provider; }
 }

@@ -1,6 +1,8 @@
 package com.tks.erplocal.infrastructure.adapters.inbound.rest;
 
 import com.tks.erplocal.domain.users.exceptions.EmailAlreadyExistsException;
+import com.tks.erplocal.domain.users.exceptions.InvalidCredentialsException;
+import com.tks.erplocal.domain.users.exceptions.ServerMisconfiguredException;
 import com.tks.erplocal.domain.users.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +29,24 @@ public class RestExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> badRequest(IllegalArgumentException e) {
+        return Map.of("error", e.getMessage() == null ? "Bad request" : e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> unauthorized(InvalidCredentialsException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> forbidden(IllegalStateException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(ServerMisconfiguredException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> misconfigured(ServerMisconfiguredException e) {
         return Map.of("error", e.getMessage());
     }
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.tks.erplocal.domain.users.model.AuthProvider;
 import com.tks.erplocal.domain.users.model.Role;
 
 @Entity
@@ -37,6 +38,9 @@ public class UserEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+
     protected UserEntity() {
     }
 
@@ -56,4 +60,6 @@ public class UserEntity {
     public void setConsentAt(Instant consentAt) { this.consentAt = consentAt; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public AuthProvider getProvider() { return provider; }
+    public void setProvider(AuthProvider provider) { this.provider = provider; }
 }

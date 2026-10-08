@@ -4,6 +4,7 @@ import { renderWelcome } from "./components/welcome.ts";
 import { renderPermissions } from "./components/permissions.ts";
 import { renderUsers } from "./components/users.ts";
 import { getTheme, toggleTheme } from "../../services/theme.ts";
+import { clearSession } from "../../services/session.ts";
 
 export function getHomePage(): string {
   document.addEventListener("DOMContentLoaded", () => {
@@ -54,5 +55,10 @@ export function initHomePage(): void {
   themeBtn?.addEventListener("click", () => {
     toggleTheme();
     syncLabel();
+  });
+
+  document.querySelector<HTMLButtonElement>("#logout-btn")?.addEventListener("click", () => {
+    clearSession();
+    window.location.href = "/login";
   });
 }

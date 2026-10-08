@@ -51,6 +51,9 @@
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 [data-bs-theme="dark"] .home-sidebar {

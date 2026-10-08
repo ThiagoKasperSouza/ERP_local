@@ -11,8 +11,6 @@ import java.util.List;
 @RequestMapping("/api/permissions")
 public class PermissionController {
 
-    public record PermissionResponse(String code, String description) {}
-
     private final ListPermissionsUseCase listPermissionsUseCase;
 
     public PermissionController(ListPermissionsUseCase listPermissionsUseCase) {

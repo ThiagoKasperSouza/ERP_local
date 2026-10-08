@@ -1,7 +1,8 @@
-// @ts-expect-error CSS imports are handled by the bundler.
 import './styles.css' // css geral
+import { initTheme } from './services/theme.ts'
 import { getHomePage } from './pages/home/home.ts'
-//import { getLoginPage } from './pages/login/login.ts'
+import { getLoginPage } from './pages/login/login.ts'
+import { getErrorPage } from './pages/error/error.ts'
 //import { getRegisterPage } from './pages/register/register.ts'
 
 // 1. Define que cada rota deve ser uma função que retorna uma string HTML
@@ -9,13 +10,13 @@ type PageRenderFn = () => string;
 
 // 2. Mapeamento das rotas (HashMap)
 const routes: Record<string, PageRenderFn> = {
-  '/': getHomePage,
-  '/login': getHomePage,
+  '/home': getHomePage,
+  '/login': getLoginPage,
   '/register': getHomePage,
 };
 
 // 3. Renderizador da página 404
-const getNotFoundPage: PageRenderFn = () => '<h1>Erro 404: Página não encontrada</h1>';
+const getNotFoundPage: PageRenderFn = () => getErrorPage();
 
 function renderPage(): string {
   const path: string = window.location.pathname;
@@ -26,4 +27,11 @@ function renderPage(): string {
   return renderFn();
 }
 
+initTheme();
+
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = renderPage();
+
+
+if(window.location.pathname === '/') {
+  window.location.href = '/login';
+}

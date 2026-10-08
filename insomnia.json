@@ -1,0 +1,41 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-10-08T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v11",
+  "resources": [
+    {
+      "_id": "wrk_erplocal",
+      "_type": "workspace",
+      "name": "erplocal",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_erplocal_base",
+      "_type": "environment",
+      "parentId": "wrk_erplocal",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080"
+      }
+    },
+    {
+      "_id": "req_list_permissions",
+      "_type": "request",
+      "parentId": "wrk_erplocal",
+      "name": "List Permissions",
+      "description": "US1 - Lista canonica de permissoes (GET /api/permissions)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/permissions",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    }
+  ]
+}

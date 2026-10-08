@@ -16,7 +16,8 @@
       "parentId": "wrk_erplocal",
       "name": "Base Environment",
       "data": {
-        "base_url": "http://localhost:8080"
+        "base_url": "http://localhost:8080",
+        "user_id": "00000000-0000-0000-0000-000000000000"
       }
     },
     {
@@ -31,6 +32,128 @@
         {
           "name": "Accept",
           "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "grp_users",
+      "_type": "request_group",
+      "parentId": "wrk_erplocal",
+      "name": "Users (admin)",
+      "description": "Task2 - CRUD de usuarios. Todas exigem header X-User-Role: admin (guarda temporaria ate o login/JWT). Troque _.user_id pelo id criado."
+    },
+    {
+      "_id": "req_list_users",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "List Users",
+      "description": "GET /api/users?page=0&size=20 - so admin (403 caso contrario)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users?page=0&size=20",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "X-User-Role",
+          "value": "admin"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_create_user",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Create User",
+      "description": "POST /api/users - role default user; 409 se email repetido",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/users",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-User-Role",
+          "value": "admin"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Ana\",\n  \"email\": \"ana@local\",\n  \"password\": \"s3cr3t!\",\n  \"role\": \"user\"\n}"
+      }
+    },
+    {
+      "_id": "req_update_user",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Update User",
+      "description": "PUT /api/users/:id - nome/role/active/senha (campos opcionais)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/users/{{ _.user_id }}",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-User-Role",
+          "value": "admin"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Ana Silva\",\n  \"role\": \"admin\"\n}"
+      }
+    },
+    {
+      "_id": "req_set_permissions",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Set User Permissions",
+      "description": "PUT /api/users/:id/permissions - substitui grants; codigos validados contra PermissionsEnum (400 se invalido)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/users/{{ _.user_id }}/permissions",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "X-User-Role",
+          "value": "admin"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "[\n  \"CanManagePcp\",\n  \"CanManageOp\"\n]"
+      }
+    },
+    {
+      "_id": "req_deactivate_user",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Deactivate User",
+      "description": "DELETE /api/users/:id - soft delete (active=false, preserva registro p/ LGPD)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/users/{{ _.user_id }}",
+      "headers": [
+        {
+          "name": "X-User-Role",
+          "value": "admin"
         }
       ],
       "authentication": {},

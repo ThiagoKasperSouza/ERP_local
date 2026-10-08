@@ -2,6 +2,7 @@ import "./style.css";
 import htmlContent from "./index.html?raw";
 import { renderWelcome } from "./components/welcome.ts";
 import { renderPermissions } from "./components/permissions.ts";
+import { renderUsers } from "./components/users.ts";
 import { getTheme, toggleTheme } from "../../services/theme.ts";
 
 export function getHomePage(): string {
@@ -11,7 +12,7 @@ export function getHomePage(): string {
   return htmlContent;
 }
 
-type SectionId = "inicio" | "permissoes";
+type SectionId = "inicio" | "permissoes" | "usuarios";
 type SectionRender = (main: HTMLElement) => void | Promise<void>;
 
 // Para adicionar nova seção: crie o componente em ./components,
@@ -19,6 +20,7 @@ type SectionRender = (main: HTMLElement) => void | Promise<void>;
 const sections: Record<SectionId, SectionRender> = {
   inicio: renderWelcome,
   permissoes: renderPermissions,
+  usuarios: renderUsers,
 };
 
 export function initHomePage(): void {

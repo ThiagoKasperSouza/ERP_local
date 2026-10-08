@@ -74,3 +74,17 @@
 [data-bs-theme="dark"] .sidebar-footer {
   border-top-color: #343a40;
 }
+
+.toast-stack {
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#users-grid .ag-root-wrapper {
+  border-radius: 0.375rem;
+}

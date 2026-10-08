@@ -7,15 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-/**
- * Guarda de admin: aceita {@code Authorization: Bearer <jwt>} (fluxo real)
- * com fallback para {@code X-User-Role: admin} (dev/testes legados).
- * Qualquer outro caso → 403.
- */
+/** Guarda de admin: exige {@code Authorization: Bearer <jwt>} com claim role=ADMIN. */
 @Component
 public class RequireAdminInterceptor implements HandlerInterceptor {
-
-    static final String ROLE_HEADER = "X-User-Role";
 
     private final JwtService jwtService;
 
@@ -35,11 +29,6 @@ public class RequireAdminInterceptor implements HandlerInterceptor {
             if (principal.isPresent() && principal.get().role() == Role.ADMIN) {
                 return true;
             }
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin only");
-            return false;
-        }
-        if ("admin".equalsIgnoreCase(request.getHeader(ROLE_HEADER))) {
-            return true;
         }
         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin only");
         return false;

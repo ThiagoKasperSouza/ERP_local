@@ -38,15 +38,23 @@ class UserPermissionGrantTests {
 
     @Test
     void grantPersistsAuditAndInverseFinderWorks() throws Exception {
+        MvcResult login = mvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"admin@local\",\"password\":\"changeme\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String auth = "Bearer " + com.jayway.jsonpath.JsonPath.read(
+                login.getResponse().getContentAsString(), "$.token");
+
         String email = "grant-" + UUID.randomUUID() + "@local";
-        MvcResult created = mvc.perform(post("/api/users").header("X-User-Role", "admin")
+        MvcResult created = mvc.perform(post("/api/users").header("Authorization", auth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"G\",\"email\":\"" + email + "\",\"password\":\"pw123456\"}"))
                 .andExpect(status().isCreated())
                 .andReturn();
         String id = com.jayway.jsonpath.JsonPath.read(created.getResponse().getContentAsString(), "$.id");
 
-        mvc.perform(put("/api/users/" + id + "/permissions").header("X-User-Role", "admin")
+        mvc.perform(put("/api/users/" + id + "/permissions").header("Authorization", auth)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("[\"CanManagePcp\"]"))
                 .andExpect(status().isOk())

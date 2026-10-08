@@ -44,7 +44,7 @@
       "_type": "request_group",
       "parentId": "wrk_erplocal",
       "name": "Users (admin)",
-      "description": "Task2 - CRUD de usuarios. Todas exigem header X-User-Role: admin (guarda temporaria ate o login/JWT). Troque _.user_id pelo id criado."
+      "description": "Task2 - CRUD de usuarios. Todas exigem Authorization Bearer (token do login admin em _.token). Troque _.user_id pelo id criado."
     },
     {
       "_id": "req_list_users",
@@ -60,8 +60,8 @@
           "value": "application/json"
         },
         {
-          "name": "X-User-Role",
-          "value": "admin"
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
         }
       ],
       "authentication": {},
@@ -82,8 +82,8 @@
           "value": "application/json"
         },
         {
-          "name": "X-User-Role",
-          "value": "admin"
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
         }
       ],
       "authentication": {},
@@ -107,8 +107,8 @@
           "value": "application/json"
         },
         {
-          "name": "X-User-Role",
-          "value": "admin"
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
         }
       ],
       "authentication": {},
@@ -132,8 +132,8 @@
           "value": "application/json"
         },
         {
-          "name": "X-User-Role",
-          "value": "admin"
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
         }
       ],
       "authentication": {},
@@ -153,8 +153,8 @@
       "url": "{{ _.base_url }}/api/users/{{ _.user_id }}",
       "headers": [
         {
-          "name": "X-User-Role",
-          "value": "admin"
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
         }
       ],
       "authentication": {},

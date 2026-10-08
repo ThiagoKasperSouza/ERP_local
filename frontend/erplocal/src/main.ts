@@ -1,22 +1,29 @@
-import { invoke } from "@tauri-apps/api/core";
+// @ts-expect-error CSS imports are handled by the bundler.
+import './styles.css' // css geral
+import { getHomePage } from './pages/home/home.ts'
+//import { getLoginPage } from './pages/login/login.ts'
+//import { getRegisterPage } from './pages/register/register.ts'
 
-let greetInputEl: HTMLInputElement | null;
-let greetMsgEl: HTMLElement | null;
+// 1. Define que cada rota deve ser uma função que retorna uma string HTML
+type PageRenderFn = () => string;
 
-async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
-    });
-  }
+// 2. Mapeamento das rotas (HashMap)
+const routes: Record<string, PageRenderFn> = {
+  '/': getHomePage,
+  '/login': getHomePage,
+  '/register': getHomePage,
+};
+
+// 3. Renderizador da página 404
+const getNotFoundPage: PageRenderFn = () => '<h1>Erro 404: Página não encontrada</h1>';
+
+function renderPage(): string {
+  const path: string = window.location.pathname;
+
+  // Busca a função de renderização no HashMap; se não existir, usa a de 404
+  const renderFn: PageRenderFn = routes[path] ?? getNotFoundPage;
+
+  return renderFn();
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    greet();
-  });
-});
+document.querySelector<HTMLDivElement>('#app')!.innerHTML = renderPage();

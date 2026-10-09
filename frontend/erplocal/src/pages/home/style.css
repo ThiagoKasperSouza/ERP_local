@@ -91,3 +91,127 @@
 #users-grid .ag-root-wrapper {
   border-radius: 0.375rem;
 }
+
+.vault-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.vault-tree {
+  width: 230px;
+  flex-shrink: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.375rem;
+  background-color: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+.vault-tree-title {
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--bs-secondary-color, #6c757d);
+}
+
+.vault-tree-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.vault-tree-list button {
+  width: 100%;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.vault-tree-list button:hover {
+  background-color: var(--bs-secondary-bg, #e9ecef);
+}
+
+.vault-tree-list button.active {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.vault-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.vault-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.vault-search {
+  max-width: 280px;
+}
+
+.vault-sort {
+  max-width: 160px;
+}
+
+.vault-zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0;
+}
+
+.vault-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.vault-card {
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  text-align: center;
+  background-color: var(--bs-body-bg, #fff);
+}
+
+.vault-card:hover {
+  border-color: #0d6efd;
+}
+
+.vault-card-icon {
+  font-size: var(--vault-icon-size, 56px);
+  line-height: 1.2;
+}
+
+.vault-card-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.25rem;
+}
+
+.vault-card-meta {
+  font-size: 0.75rem;
+  color: var(--bs-secondary-color, #6c757d);
+}
+
+.vault-card-actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}

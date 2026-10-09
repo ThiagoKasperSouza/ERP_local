@@ -3,6 +3,7 @@ import htmlContent from "./index.html?raw";
 import { renderWelcome } from "./components/welcome.ts";
 import { renderPermissions } from "./components/permissions.ts";
 import { renderUsers } from "./components/users.ts";
+import { renderVault } from "./components/vaultExplorer.ts";
 import { getTheme, toggleTheme } from "../../services/theme.ts";
 import { clearSession } from "../../services/session.ts";
 
@@ -13,7 +14,7 @@ export function getHomePage(): string {
   return htmlContent;
 }
 
-type SectionId = "inicio" | "permissoes" | "usuarios";
+type SectionId = "inicio" | "permissoes" | "usuarios" | "cofre";
 type SectionRender = (main: HTMLElement) => void | Promise<void>;
 
 // Para adicionar nova seção: crie o componente em ./components,
@@ -22,6 +23,7 @@ const sections: Record<SectionId, SectionRender> = {
   inicio: renderWelcome,
   permissoes: renderPermissions,
   usuarios: renderUsers,
+  cofre: renderVault,
 };
 
 export function initHomePage(): void {

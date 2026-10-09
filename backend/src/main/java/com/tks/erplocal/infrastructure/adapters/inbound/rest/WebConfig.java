@@ -8,13 +8,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final RequireAdminInterceptor requireAdminInterceptor;
+    private final VaultPermissionInterceptor vaultPermissionInterceptor;
 
-    public WebConfig(RequireAdminInterceptor requireAdminInterceptor) {
+    public WebConfig(RequireAdminInterceptor requireAdminInterceptor,
+                     VaultPermissionInterceptor vaultPermissionInterceptor) {
         this.requireAdminInterceptor = requireAdminInterceptor;
+        this.vaultPermissionInterceptor = vaultPermissionInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(requireAdminInterceptor).addPathPatterns("/api/users/**");
+        registry.addInterceptor(vaultPermissionInterceptor).addPathPatterns("/api/vault/**");
     }
 }

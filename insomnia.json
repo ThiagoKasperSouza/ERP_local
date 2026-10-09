@@ -18,6 +18,7 @@
       "data": {
         "base_url": "http://localhost:8080",
         "user_id": "00000000-0000-0000-0000-000000000000",
+        "file_id": "00000000-0000-0000-0000-000000000000",
         "token": "COLE_O_JWT_AQUI"
       }
     },
@@ -265,6 +266,193 @@
           "name": "Accept",
           "value": "application/json"
         },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "grp_vault",
+      "_type": "request_group",
+      "parentId": "wrk_erplocal",
+      "name": "Vault (CanUseVault)",
+      "description": "US3 - Cofre de arquivos. Todas exigem Authorization Bearer de usuario com grant CanUseVault (ou admin). PUT/DELETE so admin. Troque _.file_id pelo id retornado no upload."
+    },
+    {
+      "_id": "req_vault_upload",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Upload File",
+      "description": "POST /api/vault/files multipart - selecione o arquivo no campo file; projectCode opcional; 400 p/ extensao nao permitida",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/vault/files",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "file",
+            "fileName": "SELECIONE_UM_ARQUIVO.pdf",
+            "type": "file"
+          },
+          {
+            "name": "projectCode",
+            "value": "MOTOR-X12"
+          }
+        ]
+      }
+    },
+    {
+      "_id": "req_vault_list",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "List Files",
+      "description": "GET /api/vault/files - respeita visibilidade (admin tudo; CanApprove sem TBO; comum so aprovados)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files?page=0&size=20",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_list_project",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "List Files by Project",
+      "description": "GET /api/vault/files?project= - filtro por projectCode",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files?project=MOTOR-X12",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_projects",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "List Projects",
+      "description": "GET /api/vault/files/projects - agrupamento [{code, fileCount}] p/ a arvore do explorer",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files/projects",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_get",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Get File",
+      "description": "GET /api/vault/files/:id - metadados (403 se sem visibilidade, 404 se inexistente)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_download",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Download File",
+      "description": "GET /api/vault/files/:id/download - bytes como attachment",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}/download",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_update",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Update File (admin)",
+      "description": "PUT /api/vault/files/:id - so admin; nome/status/aprovador/referencia/projeto (tudo opcional)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"APPLICATION\",\n  \"projectCode\": \"MOTOR-X12\"\n}"
+      }
+    },
+    {
+      "_id": "req_vault_delete",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Delete File (admin)",
+      "description": "DELETE /api/vault/files/:id - so admin; remove bytes + metadados (204)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}",
+      "headers": [
         {
           "name": "Authorization",
           "value": "Bearer {{ _.token }}"

@@ -4,6 +4,8 @@ import com.tks.erplocal.domain.users.exceptions.EmailAlreadyExistsException;
 import com.tks.erplocal.domain.users.exceptions.InvalidCredentialsException;
 import com.tks.erplocal.domain.users.exceptions.ServerMisconfiguredException;
 import com.tks.erplocal.domain.users.exceptions.UserNotFoundException;
+import com.tks.erplocal.domain.vault.exceptions.VaultAccessDeniedException;
+import com.tks.erplocal.domain.vault.exceptions.VaultFileNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -47,6 +49,18 @@ public class RestExceptionHandler {
     @ExceptionHandler(ServerMisconfiguredException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> misconfigured(ServerMisconfiguredException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(VaultFileNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> vaultNotFound(VaultFileNotFoundException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(VaultAccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> vaultDenied(VaultAccessDeniedException e) {
         return Map.of("error", e.getMessage());
     }
 }

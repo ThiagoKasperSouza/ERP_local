@@ -460,7 +460,7 @@ export async function renderVault(main: HTMLElement): Promise<void> {
         const data = await uploadDialog(state.projects);
         if (!data) return;
         try {
-          await uploadFile(data.file, data.projectCode, data.externalReference);
+          await uploadFile(data.file, data.projectCode, data.externalReference, data.ebom, data.isAssembly);
           toast(main, "Arquivo enviado.", "success");
           await reload();
         } catch (e) {

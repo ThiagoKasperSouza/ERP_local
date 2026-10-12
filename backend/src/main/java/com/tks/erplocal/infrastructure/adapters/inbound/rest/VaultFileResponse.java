@@ -8,12 +8,12 @@ import java.util.UUID;
 public record VaultFileResponse(UUID id, String name, String kind, String mimeType, long sizeBytes,
                                 int versionNumber, String status, boolean pendingApproval,
                                 UUID uploadedBy, UUID approver, String externalReference,
-                                String projectCode,
+                                String projectCode, UUID parentId, String ebomReference,
                                 Instant createdAt, Instant updatedAt) {
     public static VaultFileResponse from(VaultFile f) {
         return new VaultFileResponse(f.getId(), f.getName(), f.getKind().name(), f.getMimeType(),
                 f.getSizeBytes(), f.getVersionNumber(), f.getStatus().name(), f.isPendingApproval(),
                 f.getUploadedBy(), f.getApprover(), f.getExternalReference(), f.getProjectCode(),
-                f.getCreatedAt(), f.getUpdatedAt());
+                f.getParentId(), f.getEbomReference(), f.getCreatedAt(), f.getUpdatedAt());
     }
 }

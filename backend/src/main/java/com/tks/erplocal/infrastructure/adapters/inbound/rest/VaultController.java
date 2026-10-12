@@ -7,6 +7,7 @@ import com.tks.erplocal.app.usecases.vault.ListProjectsUseCase;
 import com.tks.erplocal.app.usecases.vault.ListVaultFilesUseCase;
 import com.tks.erplocal.app.usecases.vault.UpdateVaultFileMetadataUseCase;
 import com.tks.erplocal.app.usecases.vault.UploadVaultFileUseCase;
+import com.tks.erplocal.app.usecases.vault.UploadAssemblyWithEbomUseCase;
 import com.tks.erplocal.domain.vault.model.FileStatus;
 import com.tks.erplocal.domain.vault.model.VaultFile;
 import com.tks.erplocal.infrastructure.security.JwtService;
@@ -47,6 +48,7 @@ public class VaultController {
     private final UpdateVaultFileMetadataUseCase updateVaultFileMetadataUseCase;
     private final DeleteVaultFileUseCase deleteVaultFileUseCase;
     private final JwtService jwtService;
+    private final UploadAssemblyWithEbomUseCase uploadAssemblyWithEbomUseCase;
 
     public VaultController(UploadVaultFileUseCase uploadVaultFileUseCase,
                            ListVaultFilesUseCase listVaultFilesUseCase,
@@ -55,7 +57,8 @@ public class VaultController {
                            DownloadVaultFileUseCase downloadVaultFileUseCase,
                            UpdateVaultFileMetadataUseCase updateVaultFileMetadataUseCase,
                            DeleteVaultFileUseCase deleteVaultFileUseCase,
-                           JwtService jwtService) {
+                           JwtService jwtService,
+                           UploadAssemblyWithEbomUseCase uploadAssemblyWithEbomUseCase) {
         this.uploadVaultFileUseCase = uploadVaultFileUseCase;
         this.listVaultFilesUseCase = listVaultFilesUseCase;
         this.getVaultFileUseCase = getVaultFileUseCase;
@@ -64,6 +67,7 @@ public class VaultController {
         this.deleteVaultFileUseCase = deleteVaultFileUseCase;
         this.listProjectsUseCase = listProjectsUseCase;
         this.jwtService = jwtService;
+        this.uploadAssemblyWithEbomUseCase = uploadAssemblyWithEbomUseCase;
     }
 
     private UUID callerId(String authorization) {
@@ -84,6 +88,38 @@ public class VaultController {
         VaultFile saved = uploadVaultFileUseCase.execute(
                 callerId(authorization), file.getOriginalFilename(), file.getContentType(),
                 file.getInputStream(), file.getSize(), externalReference, projectCode);
+        return VaultFileResponse.from(saved);
+    }
+
+    @PostMapping(value = "/assembly", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequirePermission("CanUseVault")
+    public VaultFileResponse uploadAssembly(@RequestHeader("Authorization") String authorization,
+                                            @RequestParam("assembly") MultipartFile assembly,
+                                            @RequestParam("ebom") MultipartFile ebom,
+                                            @RequestParam(value = "projectCode", required = false) String projectCode)
+            throws IOException {
+        VaultFile assemblyFile = new VaultFile(
+                UUID.randomUUID(),
+                assembly.getOriginalFilename(),
+                com.tks.erplocal.domain.vault.model.FileKind.fromFilename(assembly.getOriginalFilename()),
+                assembly.getContentType(),
+                assembly.getSize(),
+                "",
+                1,
+                com.tks.erplocal.domain.vault.model.FileStatus.PROTOTYPE,
+                false,
+                callerId(authorization),
+                null,
+                null,
+                null,
+                null
+        );
+        assemblyFile.setProjectCode(projectCode);
+        VaultFile saved = uploadAssemblyWithEbomUseCase.execute(
+                assemblyFile,
+                ebom.getBytes(), ebom.getOriginalFilename()
+        );
         return VaultFileResponse.from(saved);
     }
 
@@ -144,4 +180,6 @@ public class VaultController {
     public void delete(@PathVariable UUID id) {
         deleteVaultFileUseCase.execute(id);
     }
+
+
 }

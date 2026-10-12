@@ -314,6 +314,42 @@
       }
     },
     {
+      "_id": "req_vault_assembly_upload",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Upload Assembly with EBOM",
+      "description": "POST /api/vault/files/assembly multipart - assembly (arquivo CAD) + ebom (CSV obrigatório); cria árvore de filhos a partir da EBOM",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/vault/files/assembly",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "assembly",
+            "fileName": "montagem.sldasm",
+            "type": "file"
+          },
+          {
+            "name": "ebom",
+            "fileName": "ebom.csv",
+            "type": "file"
+          },
+          {
+            "name": "projectCode",
+            "value": "MOTOR-X12"
+          }
+        ]
+      }
+    },
+    {
       "_id": "req_vault_list",
       "_type": "request",
       "parentId": "grp_vault",

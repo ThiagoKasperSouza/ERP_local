@@ -59,11 +59,19 @@ export async function uploadFile(
   file: File,
   projectCode?: string,
   externalReference?: string,
+  ebom?: File,
+  isAssembly?: boolean,
 ): Promise<VaultFile> {
   const form = new FormData();
-  form.append("file", file);
+  if (isAssembly) {
+    form.append("assembly", file);
+    if (ebom) form.append("ebom", ebom);
+  } else {
+    form.append("file", file);
+  }
   if (projectCode?.trim()) form.append("projectCode", projectCode.trim());
   if (externalReference?.trim()) form.append("externalReference", externalReference.trim());
+  const url = isAssembly ? `${API_BASE}/api/vault/files/assembly` : `${API_BASE}/api/vault/files`;
   const res = await fetch(`${API_BASE}/api/vault/files`, {
     method: "POST",
     headers: { Accept: "application/json", ...authHeaders() },

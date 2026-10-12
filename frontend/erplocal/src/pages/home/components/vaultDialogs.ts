@@ -57,8 +57,10 @@ const ALLOWED_EXT = [
 
 export interface UploadData {
   file: File;
+  ebom?: File;
   projectCode: string;
   externalReference: string;
+  isAssembly: boolean;
 }
 
 /** Upload com projeto (autocomplete) + referência externa opcional. */
@@ -80,6 +82,15 @@ export function uploadDialog(projects: ProjectGroup[]): Promise<UploadData | nul
             ${projects.map((p) => `<option value="${p.code}"></option>`).join("")}
           </datalist>
         </div>
+        <div class="mb-3 form-check">
+          <input class="form-check-input" type="checkbox" id="dlg-is-assembly" />
+          <label class="form-check-label" for="dlg-is-assembly">É uma montagem (assembly)</label>
+        </div>
+        <div class="mb-3" id="dlg-ebom-group" style="display:none;">
+          <label class="form-label" for="dlg-ebom">EBOM (CSV obrigatório)</label>
+          <input class="form-control" id="dlg-ebom" type="file" accept=".csv" />
+          <div class="invalid-feedback"></div>
+        </div>
         <div class="mb-3">
           <label class="form-label" for="dlg-extref">Referência externa (opcional)</label>
           <input class="form-control" id="dlg-extref" placeholder="Código EBOM/MBOM…" />
@@ -91,6 +102,12 @@ export function uploadDialog(projects: ProjectGroup[]): Promise<UploadData | nul
     const fileInput = modalEl.querySelector<HTMLInputElement>("#dlg-file")!;
     const projectInput = modalEl.querySelector<HTMLInputElement>("#dlg-project")!;
     const extRefInput = modalEl.querySelector<HTMLInputElement>("#dlg-extref")!;
+    const isAssemblyInput = modalEl.querySelector<HTMLInputElement>("#dlg-is-assembly")!;
+    const ebomGroup = modalEl.querySelector<HTMLElement>("#dlg-ebom-group")!;
+    const ebomInput = modalEl.querySelector<HTMLInputElement>("#dlg-ebom")!;
+    isAssemblyInput.addEventListener("change", () => {
+      ebomGroup.style.display = isAssemblyInput.checked ? "block" : "none";
+    });
     let done = false;
     const finish = (value: UploadData | null): void => {
       done = true;
@@ -114,8 +131,18 @@ export function uploadDialog(projects: ProjectGroup[]): Promise<UploadData | nul
           if (feedback) feedback.textContent = `Extensão .${ext || "?"} não permitida.`;
           return;
         }
+        const isAssembly = isAssemblyInput.checked;
+        const ebomFile = ebomInput.files?.[0];
+        if (isAssembly && !ebomFile) {
+          ebomInput.classList.add("is-invalid");
+          ebomInput.parentElement?.querySelector(".invalid-feedback")!.textContent = "EBOM obrigatório para montagem.";
+          return;
+        }
+        if (isAssembly) {
+          ebomInput.classList.remove("is-invalid");
+        }
         fileInput.classList.remove("is-invalid");
-        finish({ file, projectCode: projectInput.value.trim(), externalReference: extRefInput.value.trim() });
+        finish({ file, ebom: ebomFile ?? undefined, projectCode: projectInput.value.trim(), externalReference: extRefInput.value.trim(), isAssembly });
       });
     modalEl.addEventListener("hidden.bs.modal", () => {
       if (!done) resolve(null);
@@ -216,7 +243,15 @@ export function detailsDialog(file: VaultFile, uploaderName: string): void {
       ${row("Criado em", new Date(file.createdAt).toLocaleString("pt-BR"))}
       ${row("Alterado em", new Date(file.updatedAt).toLocaleString("pt-BR"))}
       ${row("Ref. externa", file.externalReference ? escapeHtml(file.externalReference) : "<span class='text-muted'>—</span>")}
-    </dl>`,
+    </dl>
+    <div class="mt-3">
+      <h6>Componentes / Filhos</h6>
+      <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px;">
+        <ul class="list-group list-group-flush" id="dlg-children">
+          <li class="list-group-item text-muted">Carregando...</li>
+        </ul>
+      </div>
+    </div>`,
     `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>`,
   );
   showModal(modalEl);

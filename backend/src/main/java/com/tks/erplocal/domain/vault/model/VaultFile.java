@@ -18,6 +18,8 @@ public class VaultFile {
     private String externalReference;
     private Instant createdAt;
     private Instant updatedAt;
+    private UUID parentId;
+    private String ebomReference;
     private String projectCode;
 
     public VaultFile(UUID id, String name, FileKind kind, String mimeType, long sizeBytes,
@@ -58,6 +60,10 @@ public class VaultFile {
     public void setApprover(UUID approver) { this.approver = approver; }
     public String getExternalReference() { return externalReference; }
     public void setExternalReference(String externalReference) { this.externalReference = externalReference; }
+    public UUID getParentId() { return parentId; }
+    public void setParentId(UUID parentId) { this.parentId = parentId; }
+    public String getEbomReference() { return ebomReference; }
+    public void setEbomReference(String ebomReference) { this.ebomReference = ebomReference; }
     public String getProjectCode() { return projectCode; }
     public void setProjectCode(String projectCode) { this.projectCode = projectCode; }
     public Instant getCreatedAt() { return createdAt; }

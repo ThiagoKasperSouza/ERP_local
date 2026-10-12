@@ -135,7 +135,8 @@ export function uploadDialog(projects: ProjectGroup[]): Promise<UploadData | nul
         const ebomFile = ebomInput.files?.[0];
         if (isAssembly && !ebomFile) {
           ebomInput.classList.add("is-invalid");
-          ebomInput.parentElement?.querySelector(".invalid-feedback")!.textContent = "EBOM obrigatório para montagem.";
+          const ebomFeedback = ebomInput.parentElement?.querySelector(".invalid-feedback");
+          if (ebomFeedback) ebomFeedback.textContent = "EBOM obrigatório para montagem.";
           return;
         }
         if (isAssembly) {

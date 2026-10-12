@@ -1,0 +1,502 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-10-08T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v11",
+  "resources": [
+    {
+      "_id": "wrk_erplocal",
+      "_type": "workspace",
+      "name": "erplocal",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_erplocal_base",
+      "_type": "environment",
+      "parentId": "wrk_erplocal",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "user_id": "00000000-0000-0000-0000-000000000000",
+        "file_id": "00000000-0000-0000-0000-000000000000",
+        "token": "COLE_O_JWT_AQUI"
+      }
+    },
+    {
+      "_id": "req_list_permissions",
+      "_type": "request",
+      "parentId": "wrk_erplocal",
+      "name": "List Permissions",
+      "description": "US1 - Lista canonica de permissoes (GET /api/permissions)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/permissions",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "grp_users",
+      "_type": "request_group",
+      "parentId": "wrk_erplocal",
+      "name": "Users (admin)",
+      "description": "Task2 - CRUD de usuarios. Todas exigem Authorization Bearer (token do login admin em _.token). Troque _.user_id pelo id criado."
+    },
+    {
+      "_id": "req_list_users",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "List Users",
+      "description": "GET /api/users?page=0&size=20 - so admin (403 caso contrario)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users?page=0&size=20",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_create_user",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Create User",
+      "description": "POST /api/users - role default user; 409 se email repetido",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/users",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Ana\",\n  \"email\": \"ana@local\",\n  \"password\": \"s3cr3t!\",\n  \"role\": \"user\"\n}"
+      }
+    },
+    {
+      "_id": "req_update_user",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Update User",
+      "description": "PUT /api/users/:id - nome/role/active/senha (campos opcionais)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/users/{{ _.user_id }}",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Ana Silva\",\n  \"role\": \"admin\"\n}"
+      }
+    },
+    {
+      "_id": "req_set_permissions",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Set User Permissions",
+      "description": "PUT /api/users/:id/permissions - substitui grants; codigos validados contra PermissionsEnum (400 se invalido)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/users/{{ _.user_id }}/permissions",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "[\n  \"CanManagePcp\",\n  \"CanManageOp\"\n]"
+      }
+    },
+    {
+      "_id": "req_deactivate_user",
+      "_type": "request",
+      "parentId": "grp_users",
+      "name": "Deactivate User",
+      "description": "DELETE /api/users/:id - soft delete (active=false, preserva registro p/ LGPD)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/users/{{ _.user_id }}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "grp_auth",
+      "_type": "request_group",
+      "parentId": "wrk_erplocal",
+      "name": "Auth",
+      "description": "Task3 - registro/login JWT + Google. Copie o token p/ a env _.token e use como Bearer nos Users."
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Register",
+      "description": "POST /api/auth/register - sempre USER; 409 se email repetido",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Ana\",\n  \"email\": \"ana@local\",\n  \"password\": \"s3cr3t!\"\n}"
+      }
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Login",
+      "description": "POST /api/auth/login - 401 se credenciais invalidas",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"ana@local\",\n  \"password\": \"s3cr3t!\"\n}"
+      }
+    },
+    {
+      "_id": "req_google_login",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Google Login",
+      "description": "POST /api/auth/google - idToken do botao Google (GIS); cria usuario GOOGLE se nao existir",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/google",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"idToken\": \"COLE_O_ID_TOKEN_AQUI\"\n}"
+      }
+    },
+    {
+      "_id": "req_google_code_login",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "Google Code Login (Tauri)",
+      "description": "POST /api/auth/google/code - fluxo PKCE do app instalado; backend troca pelo idToken com o secret",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/google/code",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"code\": \"COLE_O_CODE_AQUI\",\n  \"codeVerifier\": \"COLE_O_VERIFIER_AQUI\",\n  \"redirectUri\": \"http://127.0.0.1:PORTA/callback\"\n}"
+      }
+    },
+    {
+      "_id": "req_list_users_bearer",
+      "_type": "request",
+      "parentId": "grp_auth",
+      "name": "List Users (Bearer)",
+      "description": "GET /api/users com Authorization Bearer do login (troque _.token)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users?page=0&size=20",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "grp_vault",
+      "_type": "request_group",
+      "parentId": "wrk_erplocal",
+      "name": "Vault (CanUseVault)",
+      "description": "US3 - Cofre de arquivos. Todas exigem Authorization Bearer de usuario com grant CanUseVault (ou admin). PUT/DELETE so admin. Troque _.file_id pelo id retornado no upload."
+    },
+    {
+      "_id": "req_vault_upload",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Upload File",
+      "description": "POST /api/vault/files multipart - selecione o arquivo no campo file; projectCode opcional; 400 p/ extensao nao permitida",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/vault/files",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "file",
+            "fileName": "SELECIONE_UM_ARQUIVO.pdf",
+            "type": "file"
+          },
+          {
+            "name": "projectCode",
+            "value": "MOTOR-X12"
+          }
+        ]
+      }
+    },
+    {
+      "_id": "req_vault_assembly_upload",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Upload Assembly with EBOM",
+      "description": "POST /api/vault/files/assembly multipart - assembly (arquivo CAD) + ebom (CSV obrigatório); cria árvore de filhos a partir da EBOM",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/vault/files/assembly",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "assembly",
+            "fileName": "montagem.sldasm",
+            "type": "file"
+          },
+          {
+            "name": "ebom",
+            "fileName": "ebom.csv",
+            "type": "file"
+          },
+          {
+            "name": "projectCode",
+            "value": "MOTOR-X12"
+          }
+        ]
+      }
+    },
+    {
+      "_id": "req_vault_list",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "List Files",
+      "description": "GET /api/vault/files - respeita visibilidade (admin tudo; CanApprove sem TBO; comum so aprovados)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files?page=0&size=20",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_list_project",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "List Files by Project",
+      "description": "GET /api/vault/files?project= - filtro por projectCode",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files?project=MOTOR-X12",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_projects",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "List Projects",
+      "description": "GET /api/vault/files/projects - agrupamento [{code, fileCount}] p/ a arvore do explorer",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files/projects",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_get",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Get File",
+      "description": "GET /api/vault/files/:id - metadados (403 se sem visibilidade, 404 se inexistente)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_download",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Download File",
+      "description": "GET /api/vault/files/:id/download - bytes como attachment",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}/download",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_vault_update",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Update File (admin)",
+      "description": "PUT /api/vault/files/:id - so admin; nome/status/aprovador/referencia/projeto (tudo opcional)",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"APPLICATION\",\n  \"projectCode\": \"MOTOR-X12\"\n}"
+      }
+    },
+    {
+      "_id": "req_vault_delete",
+      "_type": "request",
+      "parentId": "grp_vault",
+      "name": "Delete File (admin)",
+      "description": "DELETE /api/vault/files/:id - so admin; remove bytes + metadados (204)",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/vault/files/{{ _.file_id }}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "authentication": {},
+      "parameters": [],
+      "body": {}
+    }
+  ]
+}

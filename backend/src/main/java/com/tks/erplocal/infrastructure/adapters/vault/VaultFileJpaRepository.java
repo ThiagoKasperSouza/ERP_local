@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public interface VaultFileJpaRepository extends JpaRepository<VaultFileEntity, UUID> {
 
-    /** Admin: tudo. */
+    List<VaultFileEntity> findByParentId(UUID parentId);
     Page<VaultFileEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     /** Comum: só aprovados de APPLICATION/PROTOTYPE (sem pendentes, sem TBO). */

@@ -1,6 +1,7 @@
 package com.tks.erplocal.domain.vault.model;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class VaultFile {
@@ -21,6 +22,7 @@ public class VaultFile {
     private UUID parentId;
     private String ebomReference;
     private String projectCode;
+    private List<VaultFile> children;
 
     public VaultFile(UUID id, String name, FileKind kind, String mimeType, long sizeBytes,
                      String storageKey, int versionNumber, FileStatus status, boolean pendingApproval,
@@ -66,6 +68,8 @@ public class VaultFile {
     public void setEbomReference(String ebomReference) { this.ebomReference = ebomReference; }
     public String getProjectCode() { return projectCode; }
     public void setProjectCode(String projectCode) { this.projectCode = projectCode; }
+    public List<VaultFile> getChildren() { return children; }
+    public void setChildren(List<VaultFile> children) { this.children = children; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }

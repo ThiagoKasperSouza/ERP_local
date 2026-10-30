@@ -97,6 +97,10 @@ public class VaultFileRepositoryAdapter implements VaultFileRepositoryPort {
                 e.getUploadedBy(), e.getApprover(), e.getExternalReference(),
                 e.getCreatedAt(), e.getUpdatedAt());
         file.setProjectCode(e.getProjectCode());
+        file.setParentId(e.getParentId());
+        // populate children
+        List<VaultFile> kids = jpa.findByParentId(e.getId()).stream().map(this::toDomain).toList();
+        file.setChildren(kids.isEmpty() ? null : kids);
         return file;
     }
 
@@ -117,6 +121,7 @@ public class VaultFileRepositoryAdapter implements VaultFileRepositoryPort {
         e.setCreatedAt(f.getCreatedAt());
         e.setUpdatedAt(f.getUpdatedAt());
         e.setProjectCode(f.getProjectCode());
+        e.setParentId(f.getParentId());
         return e;
     }
 }

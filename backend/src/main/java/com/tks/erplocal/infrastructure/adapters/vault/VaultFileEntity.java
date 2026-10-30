@@ -59,6 +59,9 @@ public class VaultFileEntity {
     @Column(name = "project_code")
     private String projectCode;
 
+    @Column(name = "parent_id")
+    private UUID parentId;
+
     protected VaultFileEntity() {
     }
 
@@ -92,4 +95,6 @@ public class VaultFileEntity {
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
     public String getProjectCode() { return projectCode; }
     public void setProjectCode(String projectCode) { this.projectCode = projectCode; }
+    public UUID getParentId() { return parentId; }
+    public void setParentId(UUID parentId) { this.parentId = parentId; }
 }

@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public interface VaultFileJpaRepository extends JpaRepository<VaultFileEntity, UUID> {
 
+    Page<VaultFileEntity> findByApproverOrderByCreatedAtDesc(UUID approver, Pageable pageable);
     List<VaultFileEntity> findByParentId(UUID parentId);
     Page<VaultFileEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 

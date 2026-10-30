@@ -12,6 +12,7 @@ public enum PermissionsEnum {
     CAN_MANAGE_MBOM("CanManageMbom", "Acesso ao gerenciamento de MBOM"),
     CAN_MANAGE_ENG("CanManageEng", "Gerenciamento das alterações de engenharia"),
     CAN_MANAGE_PCP("CanManagePcp", "Acesso ao Pcp"),
+    CAN_LIST_APPROVERS("CanListApprovers", "Listagem de aprovadores"),
     CAN_MANAGE_OP("CanManageOp", "Gerenciamento de OPs");
 
     private final String code;

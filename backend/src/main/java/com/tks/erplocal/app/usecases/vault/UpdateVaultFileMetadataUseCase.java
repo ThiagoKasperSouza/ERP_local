@@ -19,7 +19,7 @@ public class UpdateVaultFileMetadataUseCase {
     }
 
     public VaultFile execute(UUID fileId, String name, FileStatus status, UUID approver,
-                             String externalReference, String projectCode) {
+                             String externalReference, String projectCode, Boolean pendingApproval) {
         VaultFile file = files.findById(fileId).orElseThrow(() -> new VaultFileNotFoundException(fileId));
         if (name != null && !name.isBlank()) {
             file.setName(name);
@@ -35,6 +35,9 @@ public class UpdateVaultFileMetadataUseCase {
         }
         if (projectCode != null) {
             file.setProjectCode(projectCode.isBlank() ? null : projectCode.trim());
+        }
+        if (pendingApproval != null) {
+            file.setPendingApproval(pendingApproval);
         }
         file.setUpdatedAt(Instant.now());
         return files.save(file);

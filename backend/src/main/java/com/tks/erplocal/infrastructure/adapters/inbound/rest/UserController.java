@@ -26,7 +26,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-
     private final ListUsersUseCase listUsersUseCase;
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
@@ -43,6 +42,12 @@ public class UserController {
         this.updateUserUseCase = updateUserUseCase;
         this.deactivateUserUseCase = deactivateUserUseCase;
         this.setUserPermissionsUseCase = setUserPermissionsUseCase;
+    }
+
+    @GetMapping("/approvers")
+    public List<UserResponse> approvers() {
+        ListUsersUseCase.Page result = listUsersUseCase.execute(0, 100);
+        return result.items().stream().map(UserResponse::from).toList();
     }
 
     @GetMapping
@@ -74,7 +79,6 @@ public class UserController {
 
     @PutMapping("/{id}/permissions")
     public UserResponse setPermissions(@PathVariable UUID id, @RequestBody Set<String> codes) {
-        // grantedBy null: ainda sem identidade do chamador (login futuro preenche)
         return UserResponse.from(setUserPermissionsUseCase.execute(id, codes, null));
     }
 }

@@ -66,7 +66,13 @@ public class VaultFileRepositoryAdapter implements VaultFileRepositoryPort {
                         projectCode, Set.of(FileStatus.APPLICATION, FileStatus.PROTOTYPE), pageable)
                 : jpa.findByStatusInAndPendingApprovalFalseOrderByCreatedAtDesc(
                         Set.of(FileStatus.APPLICATION, FileStatus.PROTOTYPE), pageable);
-        return result.stream().map(this::toDomain).toList();
+        // include files delegated to this viewer for approval
+        var delegated = jpa.findByApproverOrderByCreatedAtDesc(viewerId, pageable).getContent();
+        List<VaultFile> combined = new java.util.ArrayList<>(result.stream().map(this::toDomain).toList());
+        for (VaultFileEntity e : delegated) {
+            if (e.isPendingApproval()) combined.add(toDomain(e));
+        }
+        return combined;
     }
 
     @Override

@@ -25,7 +25,7 @@ public class UploadVaultFileUseCase {
 
     public VaultFile execute(UUID uploadedBy, String originalFilename, String mimeType,
                              InputStream content, long sizeBytes, String externalReference,
-                             String projectCode) throws IOException {
+                             String projectCode, UUID approverId) throws IOException {
         String filename = originalFilename == null || originalFilename.isBlank() ? "arquivo" : originalFilename;
         String ext = extensionOf(filename);
         if (!FileKind.ALLOWED_EXTENSIONS.contains(ext)) {
@@ -36,7 +36,7 @@ public class UploadVaultFileUseCase {
         Instant now = Instant.now();
         VaultFile file = new VaultFile(UUID.randomUUID(), filename, FileKind.fromFilename(filename),
                 mimeType == null ? "application/octet-stream" : mimeType, sizeBytes, key,
-                1, FileStatus.PROTOTYPE, false, uploadedBy, null, externalReference, now, now);
+                1, FileStatus.PROTOTYPE, true, uploadedBy, approverId, externalReference, now, now);
         file.setProjectCode(normalizeProjectCode(projectCode));
         return files.save(file);
     }

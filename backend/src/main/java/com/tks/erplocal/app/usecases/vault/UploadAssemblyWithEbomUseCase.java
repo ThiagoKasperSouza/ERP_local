@@ -35,7 +35,7 @@ public class UploadAssemblyWithEbomUseCase {
                 "",
                 1,
                 assembly.getStatus(),
-                false,
+                true,
                 assembly.getUploadedBy(),
                 null,
                 null,

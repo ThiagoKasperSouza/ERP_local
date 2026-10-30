@@ -83,11 +83,12 @@ public class VaultController {
     public VaultFileResponse upload(@RequestHeader("Authorization") String authorization,
                                     @RequestParam("file") MultipartFile file,
                                     @RequestParam(value = "externalReference", required = false) String externalReference,
-                                    @RequestParam(value = "projectCode", required = false) String projectCode)
+                                    @RequestParam(value = "projectCode", required = false) String projectCode,
+                                    @RequestParam(value = "approverId", required = false) UUID approverId)
             throws IOException {
         VaultFile saved = uploadVaultFileUseCase.execute(
                 callerId(authorization), file.getOriginalFilename(), file.getContentType(),
-                file.getInputStream(), file.getSize(), externalReference, projectCode);
+                file.getInputStream(), file.getSize(), externalReference, projectCode, approverId);
         return VaultFileResponse.from(saved);
     }
 
@@ -108,7 +109,7 @@ public class VaultController {
                 "",
                 1,
                 com.tks.erplocal.domain.vault.model.FileStatus.PROTOTYPE,
-                false,
+                true,
                 callerId(authorization),
                 null,
                 null,
@@ -167,11 +168,11 @@ public class VaultController {
     }
 
     @PutMapping("/{id}")
-    @RequirePermission(value = "CanUseVault", adminOnly = true)
+    @RequirePermission("CanUseVault")
     public VaultFileResponse update(@PathVariable UUID id, @RequestBody UpdateVaultFileRequest body) {
         FileStatus status = body.status() == null ? null : FileStatus.valueOf(body.status());
         return VaultFileResponse.from(updateVaultFileMetadataUseCase.execute(
-                id, body.name(), status, body.approver(), body.externalReference(), body.projectCode()));
+                id, body.name(), status, body.approver(), body.externalReference(), body.projectCode(), body.pendingApproval()));
     }
 
     @DeleteMapping("/{id}")

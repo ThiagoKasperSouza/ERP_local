@@ -1,4 +1,4 @@
-import { formatSize, kindIcon, type ProjectGroup, type VaultFile } from "../../../services/vaultApi.ts";
+import { downloadFile, formatSize, kindIcon, type ProjectGroup, type VaultFile } from "../../../services/vaultApi.ts";
 
 declare global {
   interface Window {
@@ -249,11 +249,28 @@ export function detailsDialog(file: VaultFile, uploaderName: string): void {
       <h6>Componentes / Filhos</h6>
       <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px;">
         <ul class="list-group list-group-flush" id="dlg-children">
-          <li class="list-group-item text-muted">Carregando...</li>
+          ${
+            (file.children ?? []).length === 0
+              ? `<li class="list-group-item text-muted">Nenhum componente.</li>`
+              : (file.children ?? [])
+                  .map(
+                    (c) => `<li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>${kindIcon(c.kind)} ${escapeHtml(c.name)}</span>
+                      <button type="button" class="btn btn-sm btn-outline-success" data-child-download="${escapeHtml(c.id)}">Baixar</button>
+                    </li>`,
+                  )
+                  .join("")
+          }
         </ul>
       </div>
     </div>`,
     `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>`,
   );
   showModal(modalEl);
+  modalEl.addEventListener("click", (ev) => {
+    const btn = (ev.target as HTMLElement).closest<HTMLElement>("[data-child-download]");
+    if (!btn?.dataset.childDownload) return;
+    const child = (file.children ?? []).find((c) => c.id === btn.dataset.childDownload);
+    if (child) void downloadFile(child);
+  });
 }

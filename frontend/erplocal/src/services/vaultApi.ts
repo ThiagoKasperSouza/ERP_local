@@ -16,6 +16,9 @@ export interface VaultFile {
   approver: string | null;
   externalReference: string | null;
   projectCode: string | null;
+  parentId?: string | null;
+  ebomReference?: string | null;
+  children?: VaultFile[] | null;
   createdAt: string;
   updatedAt: string;
 }

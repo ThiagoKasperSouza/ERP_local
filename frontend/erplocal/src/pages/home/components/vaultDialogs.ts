@@ -1,4 +1,5 @@
-import { downloadFile, formatSize, kindIcon, type ProjectGroup, type VaultFile } from "../../../services/vaultApi.ts";
+import { downloadFile, formatSize, kindIcon, updateFile, type ProjectGroup, type VaultFile } from "../../../services/vaultApi.ts";
+import { getCurrentUser, isAdmin } from "../../../services/session.ts";
 
 declare global {
   interface Window {
@@ -61,10 +62,10 @@ export interface UploadData {
   projectCode: string;
   externalReference: string;
   isAssembly: boolean;
+  approverId?: string;
 }
-
 /** Upload com projeto (autocomplete) + referência externa opcional. */
-export function uploadDialog(projects: ProjectGroup[]): Promise<UploadData | null> {
+export function uploadDialog(projects: ProjectGroup[], users: { id: string; name: string }[] = []): Promise<UploadData | null> {
   return new Promise((resolve) => {
     const modalEl = mountModal(
       "Enviar arquivo",
@@ -92,16 +93,19 @@ export function uploadDialog(projects: ProjectGroup[]): Promise<UploadData | nul
           <div class="invalid-feedback"></div>
         </div>
         <div class="mb-3">
-          <label class="form-label" for="dlg-extref">Referência externa (opcional)</label>
-          <input class="form-control" id="dlg-extref" placeholder="Código EBOM/MBOM…" />
+          <label class="form-label" for="dlg-approver">Aprovador (opcional)</label>
+          <select class="form-select" id="dlg-approver">
+            <option value="">— nenhum —</option>
+            ${users.map((u) => `<option value="${u.id}">${escapeHtml(u.name)}</option>`).join("")}
+          </select>
         </div>
       </form>`,
       `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
        <button type="button" class="btn btn-primary" id="dlg-save">Enviar</button>`,
     );
+    const approverInput = modalEl.querySelector<HTMLSelectElement>("#dlg-approver")!;
     const fileInput = modalEl.querySelector<HTMLInputElement>("#dlg-file")!;
     const projectInput = modalEl.querySelector<HTMLInputElement>("#dlg-project")!;
-    const extRefInput = modalEl.querySelector<HTMLInputElement>("#dlg-extref")!;
     const isAssemblyInput = modalEl.querySelector<HTMLInputElement>("#dlg-is-assembly")!;
     const ebomGroup = modalEl.querySelector<HTMLElement>("#dlg-ebom-group")!;
     const ebomInput = modalEl.querySelector<HTMLInputElement>("#dlg-ebom")!;
@@ -143,7 +147,7 @@ export function uploadDialog(projects: ProjectGroup[]): Promise<UploadData | nul
           ebomInput.classList.remove("is-invalid");
         }
         fileInput.classList.remove("is-invalid");
-        finish({ file, ebom: ebomFile ?? undefined, projectCode: projectInput.value.trim(), externalReference: extRefInput.value.trim(), isAssembly });
+        finish({ file, ebom: ebomFile ?? undefined, projectCode: projectInput.value.trim(), externalReference: "", isAssembly, approverId: approverInput.value || undefined });
       });
     modalEl.addEventListener("hidden.bs.modal", () => {
       if (!done) resolve(null);
@@ -239,6 +243,7 @@ export function detailsDialog(file: VaultFile, uploaderName: string): void {
       ${row("Tamanho", formatSize(file.sizeBytes))}
       ${row("Versão", `v${file.versionNumber}`)}
       ${row("Status", file.status + (file.pendingApproval ? ' <span class="badge bg-warning text-dark">pendente aprovação</span>' : ""))}
+      ${row("Aprovação", file.pendingApproval ? "Pendente" : "Aprovado")}
       ${row("Projeto", file.projectCode ? escapeHtml(file.projectCode) : "<span class='text-muted'>—</span>")}
       ${row("Enviado por", escapeHtml(uploaderName))}
       ${row("Criado em", new Date(file.createdAt).toLocaleString("pt-BR"))}
@@ -264,13 +269,36 @@ export function detailsDialog(file: VaultFile, uploaderName: string): void {
         </ul>
       </div>
     </div>`,
-    `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>`,
+    `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+   ${ (isAdmin() || (getCurrentUser()?.permissions.includes("CanApprove") ?? false)) && file.pendingApproval ? `<button type="button" class="btn btn-success" id="dlg-approve">Aprovar</button>
+   <button type="button" class="btn btn-danger" id="dlg-reject">Rejeitar</button>` : ""}`,
   );
   showModal(modalEl);
-  modalEl.addEventListener("click", (ev) => {
+  modalEl.addEventListener("click", async (ev) => {
     const btn = (ev.target as HTMLElement).closest<HTMLElement>("[data-child-download]");
-    if (!btn?.dataset.childDownload) return;
-    const child = (file.children ?? []).find((c) => c.id === btn.dataset.childDownload);
-    if (child) void downloadFile(child);
+    if (btn?.dataset.childDownload) {
+      const child = (file.children ?? []).find((c) => c.id === btn.dataset.childDownload);
+      if (child) void downloadFile(child);
+      return;
+    }
+    const approveBtn = (ev.target as HTMLElement).closest<HTMLElement>("#dlg-approve");
+    if (approveBtn) {
+      try {
+        await updateFile(file.id, { pendingApproval: false });
+        window.location.reload();
+      } catch (e) {
+        // ignore
+      }
+      return;
+    }
+    const rejectBtn = (ev.target as HTMLElement).closest<HTMLElement>("#dlg-reject");
+    if (rejectBtn) {
+      try {
+        await updateFile(file.id, { pendingApproval: false, status: "TBO" });
+        window.location.reload();
+      } catch (e) {
+        // ignore
+      }
+    }
   });
 }

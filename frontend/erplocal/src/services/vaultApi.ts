@@ -64,6 +64,7 @@ export async function uploadFile(
   externalReference?: string,
   ebom?: File,
   isAssembly?: boolean,
+  approverId?: string,
 ): Promise<VaultFile> {
   const form = new FormData();
   if (isAssembly) {
@@ -74,6 +75,7 @@ export async function uploadFile(
   }
   if (projectCode?.trim()) form.append("projectCode", projectCode.trim());
   if (externalReference?.trim()) form.append("externalReference", externalReference.trim());
+  if (approverId?.trim()) form.append("approverId", approverId.trim());
   const url = isAssembly ? `${API_BASE}/api/vault/files/assembly` : `${API_BASE}/api/vault/files`;
   const res = await fetch(`${API_BASE}/api/vault/files`, {
     method: "POST",
@@ -91,7 +93,7 @@ export async function uploadFile(
 
 export function updateFile(
   id: string,
-  patch: { name?: string; status?: string; projectCode?: string | null; externalReference?: string | null },
+  patch: { name?: string; status?: string; projectCode?: string | null; externalReference?: string | null; pendingApproval?: boolean },
 ): Promise<VaultFile> {
   return request<VaultFile>(`/api/vault/files/${id}`, {
     method: "PUT",
@@ -120,6 +122,14 @@ export async function downloadFile(file: VaultFile): Promise<void> {
   anchor.click();
   anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+export function listRevisions(assemblyId: string): Promise<any[]> {
+  return request<any[]>(`/api/vault/revisions/assembly/${assemblyId}`);
+}
+export function approveRevision(id: string, approve: boolean, justification?: string): Promise<any> {
+  const q = `approve=${approve}${justification ? `&justification=${encodeURIComponent(justification)}` : ""}`;
+  return request<any>(`/api/vault/revisions/${id}/approve?${q}`, { method: "POST" });
 }
 
 export function formatSize(bytes: number): string {

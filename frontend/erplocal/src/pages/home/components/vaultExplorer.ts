@@ -10,7 +10,7 @@ import {
   type ICellRendererParams,
 } from "ag-grid-community";
 import { getTheme } from "../../../services/theme.ts";
-import { getCurrentUser, isAdmin } from "../../../services/session.ts";
+import { authHeaders, getCurrentUser, isAdmin } from "../../../services/session.ts";
 import { ApiError } from "../../../services/usersApi.ts";
 import {
   deleteFile,
@@ -128,7 +128,7 @@ const columnDefs: ColDef<VaultFile>[] = [
     width: 120,
     valueFormatter: (p) => formatSize((p.value as number) ?? 0),
   },
-  { field: "versionNumber", headerName: "Versão", width: 90, valueFormatter: (p) => `v${p.value as number}` },
+  { field: "pendingApproval", headerName: "Aprovação", width: 120, valueFormatter: (p) => (p.value ? "Pendente" : "Aprovado") },
   {
     headerName: "Status",
     width: 160,
@@ -457,10 +457,10 @@ export async function renderVault(main: HTMLElement): Promise<void> {
     .querySelector<HTMLButtonElement>("#vault-upload")
     ?.addEventListener("click", () => {
       void (async () => {
-        const data = await uploadDialog(state.projects);
+        const data = await uploadDialog(state.projects, (await fetch(`${import.meta.env.VITE_API_BASE ?? "http://localhost:8080"}/api/users/approvers`, { headers: { ...authHeaders() } }).then((r) => r.json()).catch(() => [])).map((u: any) => ({ id: u.id, name: u.name })));
         if (!data) return;
         try {
-          await uploadFile(data.file, data.projectCode, data.externalReference, data.ebom, data.isAssembly);
+          await uploadFile(data.file, data.projectCode, data.externalReference, data.ebom, data.isAssembly, data.approverId);
           toast(main, "Arquivo enviado.", "success");
           await reload();
         } catch (e) {
